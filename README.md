@@ -236,6 +236,40 @@ export class ServerComponent {
 - Instead of instantiating classes, allows working with abstractions
 - Passing contracts to the constructor
 
+- AppModule: Same instance of service is available Application-wide
+- AppComponent: Same instance of Service is available for all Components (but not for other Services)
+- Any other Component: Same instance of Service is available for the Component and all its child components
+
+- \* Remember to always use the parent instance of a service instead of using multiple instances to avoid buggy effects
+
+### @Injectable
+
+- Use @Injectable when you need to inject a service into another service (injects meta-data)
+
+```typescript
+// The service that will be injected
+import { LoggingService } from "./logging.service";
+import { Injectable } from "@angular/core";
+
+@Injectable()
+export class AccountsService {
+  accounts = [...];
+
+  constructor(private loggingService: LoggingService) {}
+
+  addAccount(name: string, status: string) {
+    ...
+    this.loggingService.logStatusChange(status);
+  }
+
+  updateSTatus(id: number, status: string) {
+    ...
+    this.loggingService.logStatusChange(status);
+  }
+}
+
+```
+
 ```typescript
 export class LoggingService {
   logStatusChange(status: string) {
