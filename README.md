@@ -477,7 +477,7 @@ const appRoutes: Routes = [
 
 - It's good practice to keep routes in a separate file
 
-<app.module>
+<app.module.ts>
 
 ```typescript
 import { AppRoutingModule } from "./app-routing.module";
@@ -493,7 +493,7 @@ export class AppModule {}
 
 ```
 
-<app-routing.module>
+<app-routing.module.ts>
 
 ```typescript
 import { Routes, RouterModule } from "@angular/router";
@@ -507,6 +507,73 @@ const appRoutes: Routes = [...]
   exports: [RouterModule]
 })
 export class AppRoutingModule {}
+```
+
+---
+
+### Route guards
+
+- Prevent accessing unauthorized resources or components
+- Can protect both parent and child components
+- It's mandatory to implement the interfaces `canActivate` or `canActivateChild`
+
+```typescript
+import {
+  CanActivate,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router,
+  CanActivateChild
+} from "@angular/router";
+import { Observable } from "rxjs/Observable";
+import { Injectable } from "@angular/core";
+import { AuthService } from "./auth.service";
+
+@Injectable()
+export class AuthGuardService implements CanActivate, CanActivateChild {
+  constructor(private authService: AuthService, private router: Router) {}
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    return this.authService.isAuthenticated().then((authenticated: boolean) => {
+      if (authenticated) {
+        return true;
+      } else {
+        this.router.navigate(["/"]);
+      }
+    });
+  }
+
+  canActivateChild(
+    childRoute: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    return this.canActivate(childRoute, state);
+  }
+}
+```
+
+```typescript
+const appRoutes: Routes = [
+  {
+    path: "servers",
+    // canActivate: [AuthGuardService],
+    canActivateChild: [AuthGuardService],
+    component: ServersComponent,
+    children: [
+      {
+        path: ":id",
+        component: ServerComponent
+      },
+      {
+        path: ":id/edit",
+        component: EditServerComponent
+      }
+    ]
+  }
+];
 ```
 
 ---
