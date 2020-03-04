@@ -350,6 +350,82 @@ export class AppModule {}
 </div>
 ```
 
+### Passing Parameters
+
+```typescript
+  const appRoutes: Routes = [
+    {
+      path: "users/:id/:name",
+      component: UserComponent
+    },
+  ...
+  ];
+```
+
+### Styling Links
+
+- It's possible to use angular directives to style router links
+
+```html
+<ul class="nav nav-tabs">
+  <li
+    role="presentation"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
+    <a routerLink="/">Home</a>
+  </li>
+  <li role="presentation" routerLinkActive="active">
+    <a routerLink="/servers">Servers</a>
+  </li>
+  <li role="presentation" routerLinkActive="active">
+    <a [routerLink]="['/users']">Users</a>
+  </li>
+</ul>
+```
+
+### Routing Programmatically
+
+```html
+<button class="btn btn-primary" (click)="onLoadServers()">Load Servers</button>
+```
+
+```typescript
+import { Router } from "@angular/router";
+
+onLoadServers() {
+    this.router.navigate(["/servers"]);
+  }
+}
+```
+
+### Changing parameters using Subscriptions
+
+```html
+<a [routerLink]="['/users', 10, 'Anna']">Load Anna</a>
+```
+
+```typescript
+export class UserComponent implements OnInit {
+  user: { id: number; name: string };
+
+  constructor(private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    // First load
+    this.user = {
+      id: this.route.snapshot.params["id"],
+      name: this.route.snapshot.params["name"]
+    };
+    // Subsequent loads, possibly changing params
+    this.route.params.subscribe((params: Params) => {
+      this.user.id = params["id"];
+      this.user.name = params["name"];
+    });
+  }
+}
+```
+
 ---
 
 This project was generated with Angular CLI version 9.0.4.
