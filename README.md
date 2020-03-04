@@ -299,6 +299,59 @@ export class NewAccountComponent {
 
 ---
 
+## Routing
+
+- Angular provides a module to handle routing
+
+```typescript
+...
+import { Routes, RouterModule } from "@angular/router";
+
+import { HomeComponent } from "./home/home.component";
+import { UsersComponent } from "./users/users.component";
+
+const appRoutes: Routes = [
+  {
+    path: "",
+    component: HomeComponent
+  },
+  {
+    path: "users",
+    component: UsersComponent
+  },
+  ...
+];
+
+@NgModule({
+  declarations: [
+    HomeComponent,
+    UsersComponent
+  ],
+  imports: [..., RouterModule.forRoot(appRoutes)],
+  ...
+})
+export class AppModule {}
+
+```
+
+```html
+<div class="container">
+  <div class="row">
+    <ul class="nav nav-tabs">
+      <li role="presentation" class="active"><a routerLink="/">Home</a></li>
+      <li role="presentation"><a routerLink="/servers">Servers</a></li>
+      <!-- allows adding more segments in the path -->
+      <li role="presentation"><a [routerLink]="['/users']">Users</a></li>
+    </ul>
+  </div>
+  <div class="row">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+```
+
+---
+
 This project was generated with Angular CLI version 9.0.4.
 
 # Development server
