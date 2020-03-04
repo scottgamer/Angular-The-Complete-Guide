@@ -426,6 +426,89 @@ export class UserComponent implements OnInit {
 }
 ```
 
+### Child routes
+
+- Child routes can be appended using the `children` property
+
+```typescript
+const appRoutes: Routes = [
+  ...{
+    path: "servers",
+    component: ServersComponent,
+    children: [
+      {
+        path: ":id",
+        component: ServerComponent
+      },
+      {
+        path: ":id/edit",
+        component: EditServerComponent
+      }
+    ]
+  }
+];
+```
+
+- And used in the parent component as another `router-outlet`
+
+```html
+<div class="col-xs-12 col-sm-4">
+  <!-- call children routes -->
+  <router-outlet></router-outlet>
+</div>
+```
+
+### Handling Query Parameters
+
+- To preserve query parameters between components set:
+
+```typescript
+  onEdit() {
+    this.router.navigate(["edit"], {
+      relativeTo: this.route,
+      queryParamsHandling: "preserve"
+    });
+  }
+```
+
+- This overrides the default behaviour, which is to drop the parameters every time a component is loaded
+
+### Out-sourcing routes
+
+- It's good practice to keep routes in a separate file
+
+<app.module>
+
+```typescript
+import { AppRoutingModule } from "./app-routing.module";
+
+@NgModule({
+  declarations: [
+    ...
+  ],
+  imports: [..., AppRoutingModule],
+  providers: [ServersService]
+})
+export class AppModule {}
+
+```
+
+<app-routing.module>
+
+```typescript
+import { Routes, RouterModule } from "@angular/router";
+/* Components Imports*/
+import { NgModule } from "@angular/core";
+
+const appRoutes: Routes = [...]
+
+@NgModule({
+  imports: [RouterModule.forRoot(appRoutes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {}
+```
+
 ---
 
 This project was generated with Angular CLI version 9.0.4.
