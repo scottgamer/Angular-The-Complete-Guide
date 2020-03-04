@@ -10,6 +10,7 @@ import { PageNotFoundComponent } from "./page-not-found/page-not-found.component
 
 import { NgModule } from "@angular/core";
 import { AuthGuardService } from "./auth-guard.service";
+import { CanDeactivateGuard } from "./servers/edit-server/can-daectivate-guard.service";
 
 const appRoutes: Routes = [
   {
@@ -39,7 +40,8 @@ const appRoutes: Routes = [
       },
       {
         path: ":id/edit",
-        component: EditServerComponent
+        component: EditServerComponent,
+        canDeactivate: [CanDeactivateGuard]
       }
     ]
   },
