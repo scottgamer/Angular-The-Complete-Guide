@@ -662,7 +662,91 @@ export class AppComponent implements OnInit {
 }
 ```
 
+### Handling HTTP Errors
+
+- It's possible to handle errors using `Subscriptions` and `Subjects`
+
+#### Using Subscriptions
+
 ```typescript
+...
+import { Subscription } from "rxjs";
+
+@Component({
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.css"]
+})
+export class AppComponent implements OnInit, OnDestroy {
+  error = null;
+
+  constructor(private postsService: PostsService) {}
+
+  private fetchPosts() {
+    this.isFetching = true;
+    this.postsService.fetchPosts().subscribe(
+      posts => {
+        this.isFetching = false;
+        this.loadedPosts = posts;
+      },
+      error => {
+        this.isFetching = false;
+        this.error = error.message;
+      }
+    );
+  }
+}
+```
+
+#### Using Subjects
+
+```typescript
+...
+import { catchError } from "rxjs/operators";
+
+@Injectable({ providedIn: "root" })
+export class PostsService {
+  error = new Subject<string>();
+
+  constructor(private http: HttpClient) {}
+
+  createAndStorePost(postData: Post) {
+    this.http
+      .post<{ name: string }>(
+        "https://ng-complete-guide-d24fa.firebaseio.com/posts.json",
+        postData
+      )
+      .subscribe(
+        responseData => {
+          console.log(responseData);
+        },
+        error => {
+          this.error.next(error.message);
+        }
+      );
+  }
+}
+```
+
+```typescript
+export class AppComponent implements OnInit, OnDestroy {
+ ...
+  error = null;
+  private errorSub: Subscription;
+
+  constructor(private postsService: PostsService) {}
+
+  ngOnInit() {
+    this.errorSub = this.postsService.error.subscribe(
+      errorMessage => (this.error = errorMessage)
+    );
+    this.fetchPosts();
+  }
+
+  ngOnDestroy() {
+    this.errorSub.unsubscribe();
+  }
+}
 ```
 
 ---

@@ -33,21 +33,19 @@ export class PostsService {
         "https://ng-complete-guide-d24fa.firebaseio.com/posts.json"
       )
       .pipe(
-        map(
-          responseData => {
-            const postsArray: Post[] = [];
-            for (const key in responseData) {
-              if (responseData.hasOwnProperty(key)) {
-                postsArray.push({ ...responseData[key], id: key });
-              }
+        map(responseData => {
+          const postsArray: Post[] = [];
+          for (const key in responseData) {
+            if (responseData.hasOwnProperty(key)) {
+              postsArray.push({ ...responseData[key], id: key });
             }
+          }
 
-            return postsArray;
-          },
-          catchError(errorRes => {
-            return throwError(errorRes);
-          })
-        )
+          return postsArray;
+        }),
+        catchError(errorRes => {
+          return throwError(errorRes);
+        })
       );
   }
 
