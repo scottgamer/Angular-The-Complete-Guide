@@ -6,15 +6,15 @@
     <div *ngIf="isLoading" style="text-align: center;">
       <app-loading-spinner></app-loading-spinner>
     </div>
-    <form (ngSubmit)="onSubmit(authForm)" #authForm="ngForm" *ngIf="!isLoading">
+    <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)" *ngIf="!isLoading">
       <div class="form-group">
         <label for="email">Email</label>
         <input
-          type="text"
+          type="email"
           id="email"
           class="form-control"
-          name="email"
           ngModel
+          name="email"
           required
           email
         />
@@ -25,8 +25,8 @@
           type="password"
           id="password"
           class="form-control"
-          name="password"
           ngModel
+          name="password"
           required
           minlength="6"
         />
