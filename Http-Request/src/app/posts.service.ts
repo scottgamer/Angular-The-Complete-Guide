@@ -1,6 +1,11 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { map, catchError } from "rxjs/operators";
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpParams,
+  HttpEventType
+} from "@angular/common/http";
+import { map, catchError, tap } from "rxjs/operators";
 
 import { Post } from "./post.model";
 import { Subject, throwError } from "rxjs";
@@ -15,7 +20,10 @@ export class PostsService {
     this.http
       .post<{ name: string }>(
         "https://ng-complete-guide-d24fa.firebaseio.com/posts.json",
-        postData
+        postData,
+        {
+          observe: "response"
+        }
       )
       .subscribe(
         responseData => {
@@ -28,9 +36,17 @@ export class PostsService {
   }
 
   fetchPosts() {
+    let searchParams = new HttpParams();
+    searchParams = searchParams.append("print", "pretty");
+    searchParams = searchParams.append("custom", "key");
+
     return this.http
       .get<{ [key: string]: Post }>(
-        "https://ng-complete-guide-d24fa.firebaseio.com/posts.json"
+        "https://ng-complete-guide-d24fa.firebaseio.com/posts.json",
+        {
+          headers: new HttpHeaders({ "Custom-header": "hello" }),
+          params: searchParams
+        }
       )
       .pipe(
         map(responseData => {
@@ -50,8 +66,20 @@ export class PostsService {
   }
 
   deletePosts() {
-    return this.http.delete(
-      "https://ng-complete-guide-d24fa.firebaseio.com/posts.json"
-    );
+    return this.http
+      .delete("https://ng-complete-guide-d24fa.firebaseio.com/posts.json", {
+        observe: "events"
+      })
+      .pipe(
+        tap(event => {
+          console.log(event);
+          if (event.type === HttpEventType.Sent) {
+            // ...
+          }
+          if (event.type === HttpEventType.Response) {
+            console.log(event.body);
+          }
+        })
+      );
   }
 }
