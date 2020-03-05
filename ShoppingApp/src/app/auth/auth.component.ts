@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { AuthService, AuthResponseData } from "./auth.service";
 import { Observable } from "rxjs";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-auth",
@@ -14,7 +15,7 @@ export class AuthComponent implements OnInit {
   isLoading = false;
   error: string = null;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {}
 
@@ -39,11 +40,18 @@ export class AuthComponent implements OnInit {
       resData => {
         console.log(resData);
         this.isLoading = false;
+        this.router.navigate(["/recipes"]);
       },
       errorRes => {
         switch (errorRes.error.error.message) {
           case "EMAIL_EXISTS":
             this.error = "This email exists already";
+            break;
+          case "EMAIL_NOT_FOUND":
+            this.error = "This email doesn't exist";
+            break;
+          case "INVALID_PASSWORD":
+            this.error = "This password is not correct";
             break;
           default:
             this.error = "An unexpected error ocurred";
