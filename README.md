@@ -751,6 +751,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
 ---
 
+## Authentication
+
+- 
+
+```typescript
+
+```
+
+---
+
 This project was generated with Angular CLI version 9.0.4.
 
 # Development server
