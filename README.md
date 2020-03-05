@@ -578,6 +578,95 @@ const appRoutes: Routes = [
 
 ---
 
+## HTTP Requests
+
+- To make HTTP requests, Angular provides its own http client
+- The HTTP client is wrapped into observables
+
+```typescript
+...
+import { HttpClientModule } from '@angular/common/http';
+
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [..., HttpClientModule],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+
+```
+
+```typescript
+...
+import { HttpClient } from "@angular/common/http";
+
+@Component({...})
+export class AppComponent implements OnInit {
+  ...
+
+  onCreatePost(postData: { title: string; content: string }) {
+    // Send Http request
+    this.http
+      .post(
+        "https://ng-complete-guide-d24fa.firebaseio.com/posts.json",
+        postData
+      )
+      .subscribe(responseData => {
+        console.log(responseData);
+      });
+  }
+
+  onFetchPosts() {
+    // Send Http request
+  }
+
+  onClearPosts() {
+    // Send Http request
+  }
+}
+```
+
+- It's also good practice to `pipe()` the data to transform accordingly
+- And also set the type of the data that is coming in the response
+- As every HTTP method is a generic, it's possible to specy its return type
+
+```typescript
+
+import { map } from "rxjs/operators";
+
+
+@Component({...})
+export class AppComponent implements OnInit {
+  private fetchPosts() {
+    this.http
+      .get<{ [key: string]: Post }>(
+        "https://ng-complete-guide-d24fa.firebaseio.com/posts.json"
+      )
+      .pipe(
+        map(responseData => {
+          const postsArray: Post[] = [];
+          for (const key in responseData) {
+            if (responseData.hasOwnProperty(key)) {
+              postsArray.push({ ...responseData[key], id: key });
+            }
+          }
+
+          return postsArray;
+        })
+      )
+      .subscribe(posts => (this.loadedPosts = posts));
+  }
+}
+```
+
+```typescript
+```
+
+---
+
 This project was generated with Angular CLI version 9.0.4.
 
 # Development server
