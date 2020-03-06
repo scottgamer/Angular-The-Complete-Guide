@@ -753,10 +753,57 @@ export class AppComponent implements OnInit, OnDestroy {
 
 ## Authentication
 
-- 
+-
 
 ```typescript
+```
 
+---
+
+## Local Storage
+
+- Localstorage is an API provided by browsers
+- It allows to persist data on the device that hosts the application
+- Commonly used to store user data like tokens
+
+```typescript
+private handleAuthentication(
+    email: string,
+    userId: string,
+    token: string,
+    expiresIn: number
+  ) {
+    const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
+    const user = new User(email, userId, token, expirationDate);
+    this.user.next(user);
+    localStorage.setItem("userData", JSON.stringify(user));
+  }
+
+```
+
+```typescript
+ autoLogin() {
+    const userData: {
+      email: string;
+      id: string;
+      token: string;
+      tokenExpirationDate: string;
+    } = JSON.parse(localStorage.getItem("userData"));
+    if (!userData) {
+      return;
+    }
+
+    const loadedUser = new User(
+      userData.email,
+      userData.id,
+      userData.token,
+      new Date(userData.tokenExpirationDate)
+    );
+
+    if (loadedUser.getToken()) {
+      this.user.next(loadedUser);
+    }
+  }
 ```
 
 ---
