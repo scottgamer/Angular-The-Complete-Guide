@@ -808,6 +808,75 @@ private handleAuthentication(
 
 ---
 
+## Guards
+
+- Guards help protect url routes from unauthorized access
+
+```typescript
+import {
+  CanActivate,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router,
+  UrlTree
+} from "@angular/router";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { AuthService } from "./auth.service";
+import { map, take } from "rxjs/operators";
+
+@Injectable({ providedIn: "root" })
+export class AuthGuard implements CanActivate {
+  constructor(private authService: AuthService, private router: Router) {}
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    router: RouterStateSnapshot
+  ):
+    | Observable<boolean | UrlTree>
+    | Promise<boolean | UrlTree>
+    | boolean
+    | UrlTree {
+    return this.authService.user.pipe(
+      take(1),
+      map(user => {
+        const isAuth = !!user;
+        if (isAuth) {
+          return true;
+        }
+        return this.router.createUrlTree(["/auth"]);
+      })
+    );
+  }
+}
+```
+
+```typescript
+const appRoutes: Routes = [
+  ...{
+    path: "recipes",
+    component: RecipesComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: "", component: RecipeStartComponent },
+      { path: "new", component: RecipeEditComponent },
+      {
+        path: ":id",
+        component: RecipeDetailComponent,
+        resolve: [RecipesResolverService]
+      },
+      {
+        path: ":id/edit",
+        component: RecipeEditComponent,
+        resolve: [RecipesResolverService]
+      }
+    ]
+  }
+];
+```
+
+---
+
 This project was generated with Angular CLI version 9.0.4.
 
 # Development server
